@@ -164,10 +164,21 @@ if ( ! class_exists( 'WP_FetchAppBase' ) ) :
 			return $orders;
 		}
 
+    add_filter( 'cron_schedules', 'cron_add_weekly' );
+
+     function cron_add_weekly( $schedules ) {
+      // Adds once weekly to the existing schedules.
+      $schedules['quarterof'] = array(
+        'interval' => 900,
+        'display' => __( 'Every 15 minutes' )
+      );
+      return $schedules;
+     }
+
 		/* Set a scheduled sync event */
-		public function setScheduledSync(){
+		public function setScheduledSync(){quarterof
 			if ( ! wp_next_scheduled( 'fetchapp_scheduled_sync' ) ) {
-				wp_schedule_event( time(), 'hourly', 'fetchapp_scheduled_sync');
+				wp_schedule_event( time(), 'quarterof', 'fetchapp_scheduled_sync');
 			}
 		}
 
@@ -276,13 +287,13 @@ if ( ! class_exists( 'WP_FetchAppBase' ) ) :
 			add_settings_field('fetchapp_debug_mode', 'Show Debug Messages', array($this, 'fetchapp_debug_string'), 'fetchapp_wc_settings', 'fetchapp_debug');
 
 			add_settings_section('fetchapp_scheduled_sync_section', 'Scheduled Sync', array($this, 'plugin_section_text'), 'fetchapp_wc_settings');
-			add_settings_field('fetchapp_scheduled_sync', 'Sync with FetchApp every hour', array($this, 'fetchapp_scheduled_sync_string'), 'fetchapp_wc_settings', 'fetchapp_scheduled_sync_section');
+			add_settings_field('fetchapp_scheduled_sync', 'Sync with FetchApp 15 minutes', array($this, 'fetchapp_scheduled_sync_string'), 'fetchapp_wc_settings', 'fetchapp_scheduled_sync_section');
 
 			add_settings_section('fetchapp_send_incomplete_orders_section', 'Order Status', array($this, 'plugin_section_text'), 'fetchapp_wc_settings');
 			add_settings_field('fetchapp_send_incomplete_orders', 'Push incomplete orders to FetchApp', array($this, 'fetchapp_send_incomplete_orders_string'), 'fetchapp_wc_settings', 'fetchapp_send_incomplete_orders_section');
 
 		}
-		
+
 		public function plugin_section_text() {
 			echo '';
 		}
